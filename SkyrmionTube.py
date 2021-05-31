@@ -1,33 +1,23 @@
+############################################################
+# Script to generate skyrmion tube to demonstrate hopfions #
+############################################################
+
+
 import bpy
 import numpy as np
-
 import matplotlib.cm
 
 cmap = matplotlib.cm.get_cmap('RdBu_r')
 norm = matplotlib.colors.Normalize(vmin=-1, vmax=1)
 
 
-## Clear objects from previous runs
-#for obj in bpy.data.objects:
-#    bpy.data.objects.remove(obj)
+# Clear objects from previous runs
+for obj in bpy.data.objects:
+   bpy.data.objects.remove(obj)
 
-## Clear materials from pervious runs
-#for mat in bpy.data.materials:
-#    bpy.data.materials.remove(mat)
-
-#C = bpy.context
-
-#srcObj = bpy.data.objects.get('Arrow')
-
-
-#for i in range(-10, 11, 2):
-
-#    newObj = srcObj.copy()
-#    newObj.data = srcObj.data.copy()
-#    C.collection.objects.link(newObj)
-
-#    newObj.location = (i, 0, 0)
-    
+# Clear materials from pervious runs
+for mat in bpy.data.materials:
+   bpy.data.materials.remove(mat)
 
 X = np.linspace(-50, 50, 50, dtype=np.float64)
 Y = np.linspace(-50, 50, 50, dtype=np.float64)
@@ -50,25 +40,6 @@ for i in range(len(X)):
             y = Y[j]
             z = Z[k]
             
-#            if x > 0:
-#            
-#                if y > 0:
-#                    try:
-#                        bpy.data.materials[f'Cone({i},{j},{k})'].node_tree.nodes[0].inputs['Alpha'].default_value = 1.0
-#                    except KeyError:
-#                        pass
-#                    
-#                if y < 0:
-#                    try:
-#                        theCone = bpy.data.objects.get(f'Cone({i},{j},{k})')
-#                        bpy.data.objects.remove(theCone)
-#                    except TypeError:
-#                        pass
-                    
-                
-            
-            if x < 0:
-
             psi = np.arctan2(y, x)
             
             # Translation from the ring to the origin
@@ -122,11 +93,14 @@ for i in range(len(X)):
 
 
 bpy.ops.wm.save_as_mainfile(filepath=bpy.data.filepath)
-#mReduced = mArray[:-1, :-1, :-1]
-#mdx = np.diff(mArray, axis=0)[:, :-1, :-1]
-#mdy = np.diff(mArray, axis=1)[:-1, :, :-1]
-#mdz = np.diff(mArray, axis=2)[:-1, :-1, :]
 
-#oneLineHopfIdx = -np.sum(np.einsum('ijkl,ijkl->ijk', mReduced, np.einsum('ijk,ijkl->ijkl', np.cumsum(np.einsum('ijkl,ijkl->ijk', mReduced, np.cross(mdx, mdy)), axis=1), np.cross(mdz, mdy)) + np.einsum('ijk,ijkl->ijkl', np.cumsum(np.einsum('ijkl,ijkl->ijk', mReduced, np.cross(mdy, mdz)), axis=1), np.cross(mdx, mdy))))/(4*np.pi)**2
 
-#print(oneLineHopfIdx)
+# Calculate Hopf index as a sanity check
+mReduced = mArray[:-1, :-1, :-1]
+mdx = np.diff(mArray, axis=0)[:, :-1, :-1]
+mdy = np.diff(mArray, axis=1)[:-1, :, :-1]
+mdz = np.diff(mArray, axis=2)[:-1, :-1, :]
+
+oneLineHopfIdx = -np.sum(np.einsum('ijkl,ijkl->ijk', mReduced, np.einsum('ijk,ijkl->ijkl', np.cumsum(np.einsum('ijkl,ijkl->ijk', mReduced, np.cross(mdx, mdy)), axis=1), np.cross(mdz, mdy)) + np.einsum('ijk,ijkl->ijkl', np.cumsum(np.einsum('ijkl,ijkl->ijk', mReduced, np.cross(mdy, mdz)), axis=1), np.cross(mdx, mdy))))/(4*np.pi)**2
+
+print(oneLineHopfIdx)

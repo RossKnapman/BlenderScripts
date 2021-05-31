@@ -1,3 +1,7 @@
+################################################
+# Draw skyrmion textures within a vector field #
+################################################
+
 import bpy
 import numpy as np
 import matplotlib.cm
@@ -19,7 +23,7 @@ Lx = 40
 Ly = 20
 
 # Number of grid points in x and y
-noPointsX = Lx+1 if Lx % 2 == 0 else Lx  # Want to be odd number so that there is central spin
+noPointsX = Lx+1 if Lx % 2 == 0 else Lx  # Want to be odd number so that there is a central spin
 noPointsY = Ly+1 if Ly % 2 == 0 else Ly
 
 X = np.linspace(-Lx, Lx, noPointsX, dtype=np.float64)

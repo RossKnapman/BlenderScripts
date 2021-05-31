@@ -8,6 +8,16 @@ bpy.context.scene.collection.children.link(sphereCol)
 
 def drawSphere(R, h, m=1, eta=np.pi/2, N=750):
 
+    """ Vector field on a sphere with roughly equidistanct points, on which the pre-projection skyrmion is drawn. Algorithm from https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf.
+    
+    Args:
+        R: Radius of the sphere
+        h: Height of sphere above the plane (i.e. tangent to the plane for h=0)
+        m: Vorticity/skyrmion winding number
+        eta: Skyrmion helicity
+        N: Higher means more points drawn
+    """
+
     a = 4 * np.pi * R * R / (N)
     d = np.sqrt(a)
     M_theta = int(np.round(np.pi / d))
@@ -18,8 +28,6 @@ def drawSphere(R, h, m=1, eta=np.pi/2, N=750):
         bpy.data.objects.remove(object)
 
     for i in range(M_theta):
-
-        print(i, M_theta)
 
         theta = np.pi * (i + 0.5) / M_theta
         M_phi = int(np.round(2 * np.pi * np.sin(theta) / d_phi))
@@ -36,14 +44,7 @@ def drawSphere(R, h, m=1, eta=np.pi/2, N=750):
             bpy.ops.transform.rotate(value=Phi, orient_axis='Z')
 
             cone = bpy.context.active_object
-            # bpy.ops.collection.objects_remove_all()
             bpy.data.collections['Sphere'].objects.link(cone)
-
-            # Remove from other collections that are not Sphere
-            # try:
-            #     bpy.data.collections['Collection'].objects.unlink(cone)
-            # except RuntimeError:
-            #     pass
 
             try:
                 bpy.data.scenes['Scene'].collection.objects.unlink(cone)
@@ -60,8 +61,15 @@ def drawSphere(R, h, m=1, eta=np.pi/2, N=750):
 
 def middleSphere(R, h):
 
-    theName = "SphereMaterial"
+    """ Draws the base sphere, onto which the cones are "glued". 
 
+    Args:
+        R: Radius of the sphere
+        h: Height of sphere above the plane (i.e. tangent to the plane for h=0)
+    """
+
+    # Create a new material for this sphere
+    theName = "SphereMaterial"
     mat = bpy.data.materials.new(name=theName)
     mat.use_nodes = True
 
@@ -72,12 +80,11 @@ def middleSphere(R, h):
     psNode = nodes.get('Principled BSDF')
     psNode.inputs['Metallic'].default_value = 0
 
-
     # Add ramp node and colours
     rampNode = nodes.new("ShaderNodeValToRGB")
     rampNode.location.x -= 400  # Easier to see in shader editor when they're not stacked on top of each other
 
-    # Add middle colour value
+    # Add middle colour value (effectively creating our own colour map)
     rampNode.color_ramp.elements.new(position=0.5)
     rampNode.color_ramp.elements[0].color = (0, 0, 1, 1)
     rampNode.color_ramp.elements[1].color = (1, 1, 1, 1)
@@ -99,12 +106,22 @@ def middleSphere(R, h):
 
 def skyrmionFromSphere(R, h, x, y, m=1, eta=np.pi/2):
 
+    """ Create the skyrmion texture in the z=0 plane using the analytical formula from stereographic projection from a sphere tangential to the plane.
+
+    Args:
+        R: Radius of the sphere
+        h: Height of sphere above the plane (i.e. tangent to the plane for h=0)
+        x: Array of x-values 
+        y: Array of y-values
+        m: Vorticity/skyrmion number
+        eta: Helicity
+    """
+
     # Remove already existing skyrmion cones
     for object in bpy.context.scene.collection.children['Skyrmion'].objects:
         bpy.data.objects.remove(object)
 
     for i in range(len(x)):
-        print(i)
 
         for j in range(len(y)):
 
@@ -112,7 +129,7 @@ def skyrmionFromSphere(R, h, x, y, m=1, eta=np.pi/2):
             X =  x[i]
             Y = y[j]
 
-            if np.sqrt(X**2 + Y**2) < np.max(x):
+            if np.sqrt(X**2 + Y**2) < np.max(x):  # To make the skyrmion texture circular rather than square
 
                 # Spherical polars in the plane
                 phi = np.arctan2(Y, X)
@@ -126,26 +143,18 @@ def skyrmionFromSphere(R, h, x, y, m=1, eta=np.pi/2):
                 Phi = m * phi + eta
                 Theta = theta
 
-
                 bpy.ops.mesh.primitive_cone_add(location=(X, Y, 0))
 
                 bpy.ops.transform.rotate(value=theta, orient_axis='Y')
                 bpy.ops.transform.rotate(value=Phi, orient_axis='Z')
 
                 cone = bpy.context.active_object
-                # bpy.ops.collection.objects_remove_all()
                 bpy.data.collections['Skyrmion'].objects.link(cone)
-
-                # try:
-                #     bpy.data.collections['Collection'].objects.unlink(cone)
-                # except RuntimeError:
-                    # pass
 
                 try:
                     bpy.data.scenes['Scene'].collection.objects.unlink(cone)
                 except RuntimeError:
                     pass
-
 
                 bpy.ops.transform.resize(value=(0.25*R, 0.25*R, 0.25*R))
                 bpy.ops.object.shade_smooth()
@@ -157,6 +166,12 @@ def skyrmionFromSphere(R, h, x, y, m=1, eta=np.pi/2):
 
 def createMaterial(theName, theValue):
 
+    """ Create a material given the value (i.e. defining our own colour map).
+    Args:
+        theName: The desiered name of the material
+        theValue: The value which determines the colour used 
+    """
+
     mat = bpy.data.materials.new(name=theName)
     mat.use_nodes = True
 
@@ -166,7 +181,6 @@ def createMaterial(theName, theValue):
     # Shader already has Principled BSDF and MaterialOutput nodes
     psNode = nodes.get('Principled BSDF')
     psNode.inputs['Metallic'].default_value = 0
-
 
     # Add ramp node and colours
     rampNode = nodes.new("ShaderNodeValToRGB")
@@ -199,7 +213,6 @@ try:
     bpy.ops.object.delete()
 except KeyError:
     pass
-
 
 R = 3
 h = 5

@@ -1,5 +1,5 @@
 # Adapted from my processing code from master's project
-# https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf
+# Equidistance cones "glued" onto a 3D sphere, see https://www.cmu.edu/biolphys/deserno/pdf/sphere_equi.pdf for the algorithm
 
 import bpy
 import numpy as np
@@ -16,7 +16,6 @@ def drawSphere(R, h, m=1, eta=np.pi/2, N=5000):
     M_theta = int(np.round(np.pi / d))
     d_theta = np.pi / M_theta
     d_phi = a / d_theta
-
 
     for i in range(M_theta):
 

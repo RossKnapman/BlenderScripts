@@ -1,4 +1,4 @@
-# For drawing sine pulse arrows
+# For drawing a 3D sine arrow
 # For some reason, this leaves some extra points not on the sine curve which need to be deleted manually
 
 from bpy import ops, context, data
@@ -10,16 +10,15 @@ z = np.sin(x)
 ops.curve.primitive_bezier_curve_add(enter_editmode=True)
 ops.curve.subdivide(number_cuts=len(x))
 
-# Cache a reference to the curve.
+# Cache a reference to the curve
 curve = context.active_object
 
-# Locate the array of bezier points.
+# Locate the array of bezier points
 bez_points = curve.data.splines[0].bezier_points
 
 for i in range(len(x)):
     
     xValue = x[i]
-    
     zValue = z[i]
     
     if x[i] < 6 * np.pi:

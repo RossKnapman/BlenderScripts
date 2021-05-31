@@ -1,6 +1,7 @@
 import bpy
 import numpy as np
 import matplotlib.cm
+from utils import *
 
 cmap = matplotlib.cm.get_cmap('RdBu_r')
 norm = matplotlib.colors.Normalize(vmin=-1, vmax=1)
@@ -12,16 +13,6 @@ L = 20
 m = 1
 eta = np.pi/2
 
-
-def clear():
-    # Clear objects from previous runs
-    for obj in bpy.data.objects:
-        if "Cone" in obj.name or "BezierCurve" in obj.name:
-            bpy.data.objects.remove(obj)
-
-    # Clear materials from pervious runs
-    for mat in bpy.data.materials:
-        bpy.data.materials.remove(mat)
 
 
 def getXYZ(psi, alpha, chi):
@@ -72,8 +63,6 @@ def drawCones(chi, alpha, theMaterial):
     bez_points = curve.data.splines[0].bezier_points
     
     for i in range(len(psiValues)):
-        
-#        print(i, len(psiValues), end='\r')
         
         psi = psiValues[i]
 
