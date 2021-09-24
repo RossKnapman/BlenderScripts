@@ -44,7 +44,7 @@ class Skyrmion:
         self.eta = eta  # Helicity (e.g. pi/2 for Bloch-type, 0 for Néel-type, -pi/2 for Bloch type, reversed chirality)
     
     def getDistance(self, x, y):
-        """ Get the distnace between the input point and the skyrmion's centre """
+        """ Get the distance between the input point and the skyrmion's centre """
         return np.sqrt((x - self.centreX)**2 + (y - self.centreY)**2)
     
     def Theta(self, x, y):
